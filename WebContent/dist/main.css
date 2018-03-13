@@ -1,0 +1,32 @@
+.env {
+    display: inline-block;
+    margin: 10px 0;
+    min-width:150px;
+}
+.location{
+    display: block;
+    min-width:150px;
+}
+
+.tokenForm{
+    display: inline-block;
+}
+.tokenInput{
+    margin:0 0 10px 10px !important;
+    min-width: 280px !important;
+}
+
+.body-param-options, .swagger-ui .info hgroup.main a, .topbar, .scheme-container, .models {
+    display: none !important;
+}
+
+
+.updateTokenButton{
+    margin: 0 0 0 10px;
+}
+
+.updateTokenButton , .env{
+    font-size: 12px !important;
+}
+
+.brace-open { display: block; }
