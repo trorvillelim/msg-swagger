@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.swagger.util.Json;
 import main.Util.HttpDel;
+
 import main.Util.SessionUtil;
 import main.models.RequestBody;
 import main.models.ResponseWrapper;
@@ -37,6 +38,7 @@ public class ApiService {
     private String endpoint = "";
 
     private Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+
     private ResponseWrapper responseWrapper = new ResponseWrapper();
 
     public ApiService(String endpoint) {
@@ -148,6 +150,7 @@ public class ApiService {
 
     public ResponseWrapper get(String url){
         String jsonString = "";
+
         try( CloseableHttpClient client = HttpClientBuilder.create().build(); ) {
 
             HttpGet request = new HttpGet(url);
@@ -193,8 +196,6 @@ public class ApiService {
     private String getHttpResponseContent(HttpResponse response) throws IllegalStateException, IOException {
         InputStream is = response.getEntity().getContent();
         return IOUtils.toString(is, "UTF-8");
-
     }
-
 
 }

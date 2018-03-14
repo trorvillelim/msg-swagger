@@ -156,6 +156,22 @@ public class ValuationService {
         String url =  userSession.getEndpoint(true) + path;
 
         responseWrapper = apiService.get(url);
+        return Response.status(responseWrapper.getResponseCode()).entity(responseWrapper.getResponse()).build();
+    }
+
+    @Environment(environments = {"SIT", "UAT", "PROD"})
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Operation"),
+            @ApiResponse(code = 404, message = "No Operation found")})
+    public Response deleteValuation(@ApiParam(value = "Sample JSON request body", required = true) Valuation request) {
+
+        String queryString = String.valueOf(servletRequest.getQueryString());
+        String path = "/valuations/valexIds?" + queryString;
+
+        UserSession userSession = SessionUtil.getUserSession( servletRequest.getSession().getId(), servletRequest);
+        String url =  userSession.getEndpoint(true) + path;
+
+        responseWrapper = apiService.get(url);
 
         return Response.status(responseWrapper.getResponseCode()).entity(responseWrapper.getResponse()).build();
     }

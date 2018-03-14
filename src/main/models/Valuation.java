@@ -2,8 +2,10 @@
 package main.models;
 
 import com.google.gson.annotations.Expose;
+
 import io.swagger.annotations.ApiModelProperty;
 import main.annotation.DynamicData;
+
 import main.annotation.OperationHidden;
 
 public class Valuation  implements RequestBody {
@@ -84,7 +86,6 @@ public class Valuation  implements RequestBody {
     public void setAsicId(String asicId) {
         this.asicId = asicId;
     }
-
 
     public String getLender() {
         return lender;

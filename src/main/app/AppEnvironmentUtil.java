@@ -1,6 +1,8 @@
 package main.app;
 
+
 import main.annotation.DynamicData;
+
 import main.annotation.Environment;
 import main.annotation.OperationHidden;
 import org.reflections.Reflections;
@@ -21,6 +23,7 @@ public class AppEnvironmentUtil {
     public Map<String, List> methods = null;
     public Map<String, List<String>> paths = null;
     public Map<String, Map<String, String>> dynamicDataList = null;
+
 
     public enum ENVIRONMENTS {
         SIT,
@@ -90,12 +93,32 @@ public class AppEnvironmentUtil {
         }
     }
 
+
     public Map<String, Map<String, String>> getDynamicDataList() {
         return dynamicDataList;
     }
 
     public void setDynamicDataList(Map<String, Map<String, String>> dynamicDataList) {
         this.dynamicDataList = dynamicDataList;
+    }
+
+    public void setCurrentEnvironmentAndEndpoint(String environment) {
+
+//        Thread t1 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                   while(true){
+//                       Thread.sleep(1000);
+//                       System.out.println(ENVIRONMENT);
+//                   }
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        t1.start();
     }
 
     /**
@@ -174,7 +197,6 @@ public class AppEnvironmentUtil {
                     map.put(field.getName(), dynamicData.type());
                     dynamicDataList.put(operationName, map);
                 }
-
             }
         }
     }
