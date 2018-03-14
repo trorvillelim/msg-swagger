@@ -50,8 +50,8 @@ var util = {
 
     initialize: function () {
         // dynamic changes
-       // main.removeOnArrive();
-        //main.changeLabels();
+        main.removeOnArrive();
+        main.changeLabels();
 
         main.overWriteSwaggerUi(function () {
             main.environmentChangeListener();
@@ -233,7 +233,7 @@ var util = {
     $('#swagger-ui').arrive(".opblock-summary-path", function() {
         $('.opblock-summary-path').each(function () {
             if ($(this).text().search('_bsg') > -1) {
-                $('.opblock-summary-path').text("");
+                $(this).text("");
             }
         });
     });

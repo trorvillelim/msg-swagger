@@ -2,30 +2,56 @@
 package main.models;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import io.swagger.annotations.ApiModelProperty;
+import main.annotation.DynamicData;
 import main.annotation.OperationHidden;
 
 public class Valuation  implements RequestBody {
 
-    @SerializedName("userName")
     @Expose
+    @ApiModelProperty(example = "loadtestaust4", required = true)
+    @OperationHidden(operations = {"pushAdd"})
     private String userName;
-    @SerializedName("valexId")
+
     @Expose
+  //  @DynamicData(methodName = "deleteValuation", type = "array")
+    @OperationHidden(operations = {"sync"})
+    @ApiModelProperty(example = "804269 ", required = true)
     private String valexId;
-    @SerializedName("customerSurname")
+
     @Expose
+    @ApiModelProperty(example = "Kimbel", required = true)
+    @OperationHidden(operations = {"deleteValuation", "sync"})
     private String customerSurname;
-    @SerializedName("asicId")
+
     @Expose
-    @OperationHidden(operations = {"deleteValuation"})
+    @OperationHidden(operations = {"deleteValuation", "pushAdd", "sync"})
     private String asicId;
-    @SerializedName("loc")
+
     @Expose
+    @ApiModelProperty(example = "AU", required = true)
     private String loc;
-    @SerializedName("sid")
+
     @Expose
+    @OperationHidden(operations = {"pushAdd"})
+    @ApiModelProperty(example = " ", required = true)
     private String sid;
+
+    @ApiModelProperty(example = "lender ", required = false)
+    @OperationHidden(operations = {"addValuation", "deleteValuation", "sync"})
+    private String lender;
+
+    @ApiModelProperty(example = " ", required = false)
+    @OperationHidden(operations = {"addValuation", "deleteValuation", "sync"})
+    private String userMobile;
+
+    @OperationHidden(operations = {"addValuation", "deleteValuation"})
+    @ApiModelProperty(example = "hub", required = true)
+    private String source;
+
+    @OperationHidden(operations = {"addValuation", "deleteValuation"})
+    @ApiModelProperty(example = "", required = true)
+    private String userEmail;
 
     public String getUserName() {
         return userName;
@@ -57,6 +83,39 @@ public class Valuation  implements RequestBody {
 
     public void setAsicId(String asicId) {
         this.asicId = asicId;
+    }
+
+
+    public String getLender() {
+        return lender;
+    }
+
+    public void setLender(String lender) {
+        this.lender = lender;
+    }
+
+    public String getUserMobile() {
+        return userMobile;
+    }
+
+    public void setUserMobile(String userMobile) {
+        this.userMobile = userMobile;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public String getLoc() {

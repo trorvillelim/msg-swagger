@@ -24,9 +24,9 @@ public class ResponseWrapper {
         }
     }
 
-    public ResponseWrapper(JsonObject jsonObject, int httpCode){
+    public ResponseWrapper(String response, int httpCode){
         this.responseCode = httpCode;
-        this.response = jsonObject.toString();
+        this.response = response;
     }
 
     public ResponseWrapper( ){

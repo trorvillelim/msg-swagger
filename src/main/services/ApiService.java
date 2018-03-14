@@ -1,18 +1,25 @@
 package main.services;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import io.swagger.util.Json;
+import main.Util.HttpDel;
 import main.Util.SessionUtil;
 import main.models.RequestBody;
 import main.models.ResponseWrapper;
 import main.models.UserSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -29,8 +36,7 @@ public class ApiService {
     private String authorization = "Basic bXNnOkU3bVc6JTZ7REs=";
     private String endpoint = "";
 
-
-    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private ResponseWrapper responseWrapper = new ResponseWrapper();
 
     public ApiService(String endpoint) {
@@ -86,9 +92,62 @@ public class ApiService {
         return null;
     }
 
+    public ResponseWrapper delete(RequestBody requestBody, String  url) {
+        String jsonString = "";
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();) {
+
+            String requestJson = gson.toJson(requestBody);
+            HttpDel httpDel = new HttpDel(url);
+
+            StringEntity stringEntity = new StringEntity(requestJson.toString());
+            httpDel.setEntity(stringEntity);
+
+            setConnectionProperties(httpDel);
+
+            HttpResponse response = httpclient.execute(httpDel);
+
+            jsonString  = getHttpResponseContent(response);
+            return new ResponseWrapper(jsonString, response.getStatusLine().getStatusCode());
+
+
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (JsonParseException e){
+            return new ResponseWrapper(jsonString, 0);
+        }
+
+        return null;
+    }
+
+    public ResponseWrapper delete(String url) {
+        String jsonString = "";
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();) {
+            HttpDelete httpDelete = new HttpDelete(url);
+            setConnectionProperties(httpDelete);
+            HttpResponse response = httpclient.execute(httpDelete);
+
+            jsonString  = getHttpResponseContent(response);
+            return new ResponseWrapper(jsonString, response.getStatusLine().getStatusCode());
+
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (JsonParseException e){
+            return new ResponseWrapper(jsonString, 0);
+        }
+
+        return null;
+    }
+
     public ResponseWrapper get(String url){
-
-
+        String jsonString = "";
         try( CloseableHttpClient client = HttpClientBuilder.create().build(); ) {
 
             HttpGet request = new HttpGet(url);
@@ -96,13 +155,16 @@ public class ApiService {
             setConnectionProperties(request);
             HttpResponse response = client.execute(request);
 
-            JsonObject jsonObject =  getHttpResponseContent(response);
-            return new ResponseWrapper(jsonObject, response.getStatusLine().getStatusCode());
+            jsonString  = getHttpResponseContent(response);
+
+            return new ResponseWrapper(jsonString, response.getStatusLine().getStatusCode());
 
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }catch (JsonParseException e){
+            return new ResponseWrapper(jsonString, 0);
         }
 
         return null;
@@ -126,15 +188,11 @@ public class ApiService {
     private void setConnectionProperties(HttpUriRequest request) throws IOException {
         request.setHeader("Authorization", authorization);
         request.setHeader("Content-Type", "application/json;charset=UTF-8");
-
     }
 
-    private JsonObject getHttpResponseContent(HttpResponse response) throws IllegalStateException, IOException {
+    private String getHttpResponseContent(HttpResponse response) throws IllegalStateException, IOException {
         InputStream is = response.getEntity().getContent();
-        String jsonString = IOUtils.toString(is, "UTF-8");
-        JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
-
-        return jsonObject;
+        return IOUtils.toString(is, "UTF-8");
 
     }
 

@@ -16,7 +16,7 @@ public class LoginRequestBody implements RequestBody {
     @ApiModelProperty(example = "TWISTUSER001", required = true)
     String uid = "";
 
-    @ApiModelProperty(example = "loadtestaust5", required = true)
+    @ApiModelProperty(example = "loadtestaust4", required = true)
     private String user;
     @SerializedName("passwd")
 

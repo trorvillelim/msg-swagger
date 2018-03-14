@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.swagger.config.FilterFactory;
+import io.swagger.util.Json;
 import main.Util.SessionUtil;
 import main.app.ApiEnvFilterImpl;
 import main.app.AppEnvironmentUtil;
@@ -79,13 +80,11 @@ public class SwaggerMapper {
                 el = el.get("sid").getAsJsonObject();
                 el.addProperty("example", sid);
             }
-
         }
 
         response = overWriteModel(json.toString());
 
         return response;
-
     }
 
     /**
@@ -110,7 +109,6 @@ public class SwaggerMapper {
         AppEnvironmentUtil appEnvironmentUtil =  new AppEnvironmentUtil();
         appEnvironmentUtil.initializeEnvironmentApis();
 
-
         JsonObject json  = gson.fromJson(response, JsonObject.class);
 
         JsonElement paths =  json.get("paths");
@@ -118,49 +116,58 @@ public class SwaggerMapper {
 
         // get hidden fields
         Map<String, List<String>> operationHiddenPaths = appEnvironmentUtil.getPaths();
+        // get dynamic field list
+        Map<String, Map<String, String>> dynamicDataList = appEnvironmentUtil.getDynamicDataList();
 
         for (Map.Entry<String, JsonElement> path : paths.getAsJsonObject().entrySet()) {
 
-          JsonObject element =  path.getValue().getAsJsonObject();
-          JsonObject placeHolder = null;
+          for (Map.Entry<String, JsonElement> el : path.getValue().getAsJsonObject().entrySet()){
+              JsonObject placeHolder = el.getValue().getAsJsonObject();
 
-            if (element.get("delete") != null){
-                placeHolder = element.get("delete").getAsJsonObject();
-            }
-            if (element.get("get") != null){
-                placeHolder = element.get("get").getAsJsonObject();
-            }
-            if (element.get("post") != null){
-                placeHolder = element.get("post").getAsJsonObject();
-            }
+              String operationId = placeHolder.get("operationId").getAsString();
 
-            if (element.get("put") != null){
-                placeHolder = element.get("put").getAsJsonObject();
-            }
+              if (operationHiddenPaths != null && operationHiddenPaths.containsKey(operationId)){
 
-            String operationId = placeHolder.get("operationId").getAsString();
+                  // copy the model definition & hide the necessary fields
+                  JsonObject parameters = placeHolder.get("parameters").getAsJsonArray().get(0).getAsJsonObject();
+                  if (parameters.get("schema").getAsJsonObject().get("$ref") != null ){
 
-            if (operationHiddenPaths != null && operationHiddenPaths.containsKey(operationId)){
+                      String referencePath = parameters.get("schema").getAsJsonObject().get("$ref").getAsString();
+                      referencePath = referencePath.substring(referencePath.lastIndexOf("/") + 1);
 
-                // copy the model definition & hide the necessary fields
-                String referencePath = placeHolder.get("parameters").getAsJsonArray().get(0).getAsJsonObject().get("schema").getAsJsonObject().get("$ref").getAsString();
-                referencePath = referencePath.substring(referencePath.lastIndexOf("/") + 1);
+                      JsonObject cloneDefinition =  new Gson().fromJson( modelDefinitions.get(referencePath).toString(), JsonObject.class );
+                      JsonObject properties = cloneDefinition.get("properties").getAsJsonObject();
 
-                JsonObject cloneDefinition =  new Gson().fromJson( modelDefinitions.get(referencePath).toString(), JsonObject.class );
-                JsonObject properties = cloneDefinition.get("properties").getAsJsonObject();
-                for (String field : operationHiddenPaths.get(operationId)){
-                    properties.remove(field);
-                }
+                      // hide necessary fields
+                      for (String field : operationHiddenPaths.get(operationId)){
+                          properties.remove(field);
+                      }
 
-                // append the modified definition in definition scheme
-                referencePath = referencePath + "_" + operationId;
-                modelDefinitions.add(referencePath, cloneDefinition);
+                      // change dynamic data here
+                      if (dynamicDataList.containsKey(operationId)){
 
-                // replace the definition model path of the swagger path
-                placeHolder.get("parameters").getAsJsonArray().get(0).getAsJsonObject().get("schema").getAsJsonObject().addProperty("$ref","#/definitions/" +referencePath);
+                          Map<String, String> map = dynamicDataList.get(operationId);
+                          JsonObject items = new JsonObject();
+                          items.addProperty("type", "integer");
+                          items.addProperty("format", "int32");
 
-            }
+                          for (Map.Entry<String, JsonElement> property : properties.entrySet()){
+                              if (map.containsKey(property.getKey())){
+                                  property.getValue().getAsJsonObject().addProperty("type", map.get(property.getKey()));
+                                  property.getValue().getAsJsonObject().add("items", items);
+                              }
+                          }
+                      }
 
+                      // append the modified definition in definition scheme
+                      referencePath = referencePath + "_" + operationId;
+                      modelDefinitions.add(referencePath, cloneDefinition);
+
+                      // replace the definition model path of the swagger path
+                      placeHolder.get("parameters").getAsJsonArray().get(0).getAsJsonObject().get("schema").getAsJsonObject().addProperty("$ref","#/definitions/" +referencePath);
+                 }
+              }
+          }
         }
         response = json.toString();
         return response;
