@@ -19,8 +19,8 @@ Swagger for MSG API
     @OperationHidden(operations = {"deleteValuation"})
    
    
-   Know issue: 
+   Known issue: 
    You have to create seperate model if you want to use same model
-   for different endpoint with the same field name
+   for different endpoint with the same field name with different data type
     
 
