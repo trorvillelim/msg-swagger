@@ -23,4 +23,14 @@ Swagger for MSG API
    You have to create seperate model if you want to use same model
    for different endpoint with the same field name with different data type
     
+### Deployment 
+   navigate to tomcat under > conf > Catalina > localhost
+   add "swagger.xml" 
+   
+       <Context docBase="/path/to/swagger/" path="/">
+       </Context>
+       
+   access on browser :
+   
+       {yourhost}/swagger/dist/index.html
 
