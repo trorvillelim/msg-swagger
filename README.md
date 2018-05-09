@@ -34,3 +34,10 @@ Swagger for MSG API
    
        {yourhost}/swagger/dist/index.html
 
+### Server Deployment
+    to your local swagger repo
+    # create war file in your local repo REASON: maven is not install in deployment server
+    - $mvn clean install
+    # upload war file to deployment server (where we create package)
+    - $scp -P2023 /projects/msg/msg-swagger/target/msg-swagger-0.0.1-SNAPSHOT.war  msg@128.199.189.228:msg-swagger
+    - proceed to deployment
